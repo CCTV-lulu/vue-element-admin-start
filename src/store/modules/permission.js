@@ -1,5 +1,5 @@
 import { asyncRouterMap, constantRouterMap } from '@/router'
-
+import { fetchAll } from '@/api/admin/menu/index'
 /**
  * 通过meta.role判断是否与当前用户权限匹配
  * @param roles
@@ -18,20 +18,21 @@ function hasPermission(roles, route) {
  * @param routes asyncRouterMap
  * @param roles
  */
-function filterAsyncRouter(routes, roles) {
-  const res = []
-
-  routes.forEach(route => {
-    const tmp = { ...route }
-    if (hasPermission(roles, tmp)) {
-      if (tmp.children) {
-        tmp.children = filterAsyncRouter(tmp.children, roles)
+function filterAsyncRouter(asyncRouterMap, menus, menuDatas) {
+  const accessedRouters = asyncRouterMap.filter(route => {
+    if (hasPermission(menus, route)) {
+      // debugger
+      route.name = menuDatas[route.authority].title
+      // route.name = menuDatas[route.authority].name
+      route.icon = menuDatas[route.authority].icon
+      if (route.children && route.children.length) {
+        route.children = filterAsyncRouter(route.children, menus, menuDatas)
       }
-      res.push(tmp)
+      return true
     }
+    return true
   })
-
-  return res
+  return accessedRouters
 }
 
 const permission = {
@@ -46,17 +47,19 @@ const permission = {
     }
   },
   actions: {
-    GenerateRoutes({ commit }, data) {
+    GenerateRoutes({
+                     commit
+                   }, menus) {
       return new Promise(resolve => {
-        const { roles } = data
-        let accessedRouters
-        if (roles.includes('admin')) {
-          accessedRouters = asyncRouterMap
-        } else {
-          accessedRouters = filterAsyncRouter(asyncRouterMap, roles)
-        }
-        commit('SET_ROUTERS', accessedRouters)
-        resolve()
+        fetchAll().then(data => {
+          const menuDatas = {}
+          for (let i = 0; i < data.length; i++) {
+            menuDatas[data[i].code] = data[i]
+          }
+          const accessedRouters = filterAsyncRouter(asyncRouterMap, menus, menuDatas);
+          commit('SET_ROUTERS', accessedRouters)
+          resolve()
+        })
       })
     }
   }

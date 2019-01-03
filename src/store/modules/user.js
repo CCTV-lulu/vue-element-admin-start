@@ -1,4 +1,4 @@
-import { loginByUsername, logout, getUserInfo } from '@/api/login'
+import { loginByUsername, logout, getUserInfo,getMenus } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -11,6 +11,9 @@ const user = {
     avatar: '',
     introduction: '',
     roles: [],
+    menus: undefined,
+    eleemnts: undefined,
+    permissionMenus: undefined,
     setting: {
       articlePlatform: []
     }
@@ -40,7 +43,16 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
-    }
+    },
+    SET_PERMISSION_MENUS: (state, permissionMenus) => {
+      state.permissionMenus = permissionMenus;
+    },
+    SET_MENUS: (state, menus) => {
+      state.menus = menus;
+    },
+    SET_ELEMENTS: (state, elements) => {
+      state.elements = elements;
+    },
   },
 
   actions: {
@@ -49,37 +61,40 @@ const user = {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         loginByUsername(username, userInfo.password).then(response => {
-          const data = response.data
-          commit('SET_TOKEN', data.token)
-          setToken(response.data.token)
+          const token = response.data
+          commit('SET_TOKEN', token)
+          setToken(token)
           resolve()
         }).catch(error => {
           reject(error)
         })
       })
     },
-
     // 获取用户信息
     GetUserInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getUserInfo(state.token).then(response => {
-          if (!response.data) { // 由于mockjs 不支持自定义状态码只能这样hack
-            reject('error')
-          }
-          const data = response.data
-
-          if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-            commit('SET_ROLES', data.roles)
-          } else {
-            reject('getInfo: roles must be a non-null array !')
-          }
-
+          const data = response
+          commit('SET_ROLES', 'admin')
           commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
-          commit('SET_INTRODUCTION', data.introduction)
+          commit('SET_AVATAR', 'http://img.zcool.cn/community/0173e757b32f630000018c1b8767fc.png@1280w_1l_2o_100sh.png')
+          commit('SET_INTRODUCTION', data.description)
+          const menus = {}
+          for (let i = 0; i < data.menus.length; i++) {
+            menus[data.menus[i].code] = true
+          }
+          commit('SET_MENUS', menus)
+          const elements = {}
+          for (let i = 0; i < data.elements.length; i++) {
+            elements[data.elements[i].code] = true
+          }
+          commit('SET_ELEMENTS', elements)
           resolve(response)
         }).catch(error => {
           reject(error)
+        })
+        getMenus().then(response => {
+          commit('SET_PERMISSION_MENUS', response)
         })
       })
     },
@@ -99,11 +114,19 @@ const user = {
     // },
 
     // 登出
-    LogOut({ commit, state }) {
+    LogOut({
+             commit,
+             state
+           }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
+        const token = state.token
+        commit('SET_TOKEN', '')
+        logout(token).then(() => {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
+          commit('SET_MENUS', undefined)
+          commit('SET_ELEMENTS', undefined)
+          commit('SET_PERMISSION_MENUS', undefined)
           removeToken()
           resolve()
         }).catch(error => {
@@ -112,31 +135,6 @@ const user = {
       })
     },
 
-    // 前端 登出
-    FedLogOut({ commit }) {
-      return new Promise(resolve => {
-        commit('SET_TOKEN', '')
-        removeToken()
-        resolve()
-      })
-    },
-
-    // 动态修改权限
-    ChangeRoles({ commit, dispatch }, role) {
-      return new Promise(resolve => {
-        commit('SET_TOKEN', role)
-        setToken(role)
-        getUserInfo(role).then(response => {
-          const data = response.data
-          commit('SET_ROLES', data.roles)
-          commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
-          commit('SET_INTRODUCTION', data.introduction)
-          dispatch('GenerateRoutes', data) // 动态修改权限后 重绘侧边菜单
-          resolve()
-        })
-      })
-    }
   }
 }
 

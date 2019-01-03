@@ -71,43 +71,58 @@ export default new Router({
 })
 
 export const asyncRouterMap = [
-    {
-    path: '/error',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'ErrorPages',
-    meta: {
-      title: 'errorPages',
-      icon: '404'
-    },
-    children: [
-      {
-        path: '401',
-        component: () => import('@/views/errorPage/401'),
-        name: 'Page401',
-        meta: { title: 'page401', noCache: true }
-      },
-      {
-        path: '404',
-        component: () => import('@/views/errorPage/404'),
-        name: 'Page404',
-        meta: { title: 'page404', noCache: true }
-      }
-    ]
-  },
+  //   {
+  //   path: '/error',
+  //   component: Layout,
+  //   name: 'ErrorPages',
+  //   authority: 'error',
+  //   icon: '404',
+  //   children: [
+  //     {
+  //       path: '401',
+  //       component: () => import('@/views/errorPage/401'),
+  //       name: 'Page401',
+  //       icon: '404',
+  //       authority: '401',
+  //     },
+  //     {
+  //       path: '404',
+  //       component: () => import('@/views/errorPage/404'),
+  //       name: 'Page404',
+  //       icon: '404',
+  //       authority: '401'
+  //     }
+  //   ]
+  // },
 
+  // {
+  //   path: '/error-log',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   children: [
+  //     {
+  //       path: 'log',
+  //       component: () => import('@/views/errorLog/index'),
+  //       name: 'ErrorLog',
+  //       meta: { title: 'errorLog', icon: 'bug' }
+  //     }
+  //   ]
+  // },
   {
-    path: '/error-log',
+    path: '/baseManager',
     component: Layout,
-    redirect: 'noredirect',
+    name: '基础配置管理',
+    authority: 'baseManager',
+    icon: 'setting',
     children: [
       {
-        path: 'log',
-        component: () => import('@/views/errorLog/index'),
-        name: 'ErrorLog',
-        meta: { title: 'errorLog', icon: 'bug' }
+        path: 'menuManager',
+        component: () => import('@/views/admin/menu/index'),
+        name: '菜单管理',
+        icon: 'setting',
+        authority: 'menuManager',
       }
     ]
   },
-  { path: '*', redirect: '/404', hidden: true }
+  // { path: '*', redirect: '/404', hidden: true }
 ]

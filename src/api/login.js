@@ -4,12 +4,12 @@ export function loginByUsername(username, password) {
   const data = {
     username,
     password
-  }
+  };
   return request({
-    url: '/login/login',
+    url: '/api/auth/jwt/token',
     method: 'post',
     data
-  })
+  });
 }
 
 export function logout() {
@@ -21,9 +21,16 @@ export function logout() {
 
 export function getUserInfo(token) {
   return request({
-    url: '/user/info',
+    url: '/api/admin/user/front/info',
     method: 'get',
     params: { token }
-  })
+  });
 }
 
+export function getMenus(token) {
+  return fetch({
+    url: '/api/admin/user/front/menus',
+    method: 'get',
+    params: { token }
+  });
+}

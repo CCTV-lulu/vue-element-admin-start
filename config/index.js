@@ -9,7 +9,20 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/jwt': {
+        target: 'http://192.168.31.238:8765',
+        pathRewrite: {
+          '^/jwt': '/jwt'
+        },
+      },
+      '/api':{
+        target: 'http://192.168.31.238:8765',
+        pathRewrite: {
+          '^/api': '/api'
+        },
+      }
+    },
 
     // Various Dev Server settings
 
