@@ -61,7 +61,7 @@ export const constantRouterMap = [
         meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
       }
     ]
-  }
+  },
 ]
 
 export default new Router({
@@ -71,58 +71,34 @@ export default new Router({
 })
 
 export const asyncRouterMap = [
-  //   {
-  //   path: '/error',
-  //   component: Layout,
-  //   name: 'ErrorPages',
-  //   authority: 'error',
-  //   icon: '404',
-  //   children: [
-  //     {
-  //       path: '401',
-  //       component: () => import('@/views/errorPage/401'),
-  //       name: 'Page401',
-  //       icon: '404',
-  //       authority: '401',
-  //     },
-  //     {
-  //       path: '404',
-  //       component: () => import('@/views/errorPage/404'),
-  //       name: 'Page404',
-  //       icon: '404',
-  //       authority: '401'
-  //     }
-  //   ]
-  // },
-
-  // {
-  //   path: '/error-log',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   children: [
-  //     {
-  //       path: 'log',
-  //       component: () => import('@/views/errorLog/index'),
-  //       name: 'ErrorLog',
-  //       meta: { title: 'errorLog', icon: 'bug' }
-  //     }
-  //   ]
-  // },
   {
     path: '/baseManager',
     component: Layout,
-    name: '基础配置管理',
     authority: 'baseManager',
-    icon: 'setting',
+    meta: { title: '基础配置管理', icon: 'setting'},
     children: [
       {
         path: 'menuManager',
         component: () => import('@/views/admin/menu/index'),
-        name: '菜单管理',
-        icon: 'setting',
         authority: 'menuManager',
+        meta: { title: '菜单管理', icon: 'setting'},
+
       }
     ]
   },
-  // { path: '*', redirect: '/404', hidden: true }
+  {
+    path: '/testManager',
+    component: Layout,
+    authority: 'testManager',
+    meta: { title: '测试菜单', icon: 'setting'},
+    children: [
+      {
+        path: 'table',
+        component: () => import('@/views/test/table/index'),
+        authority: 'table',
+        meta: { title: '表头变动表格', icon: 'setting'},
+
+      }
+    ]
+  }
 ]
